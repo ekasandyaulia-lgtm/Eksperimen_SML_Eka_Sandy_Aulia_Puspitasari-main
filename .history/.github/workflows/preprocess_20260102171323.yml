@@ -1,0 +1,39 @@
+# trigger github actions
+
+name: Auto Preprocessing Dataset
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  preprocessing:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        pip install numpy pandas scikit-learn
+
+    - name: Run preprocessing automation
+      run: |
+        mkdir -p processed_data
+        python preprocessing/automate_Eka_Sandy_Aulia_Puspitasari.py
+
+    - name: Commit processed dataset
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+        git add processed_data/*.csv
+        git commit -m "Auto update processed dataset" || echo "No changes to commit"
+        git push
